@@ -28,12 +28,14 @@ posterior, samples = engine.run(n_samples=1000000)
 ## Requirements
 
 This version of the engine relies on TensorFlow 2.0 and TensorFlow Probability,
-which requires using the nightly builds. Using a virtualenv is a good idea ;-)
+which requires using the nightly builds. Using a virtualenv is a good idea ;-).
+While we are at it, let's also install the benchmark package:
 
 ```bash
 $ virtualenv --system-site-packages -p python3 ~/.venv/tf-nightly
 $ source ~/.venv/tf-nightly/bin/activate
 $ pip install --upgrade tf-nightly-2.0-preview tfp-nightly
+$ pip install git+https://github.com/LFITaskForce/benchmark
 ```
 
 A useful tip when working with Jupyter notebook is the possibility to define a
