@@ -14,3 +14,7 @@ conda activate engine
 pip install pyro-ppl
 pip install matplotlib
 ```
+
+## Example
+
+See `run_gaussian_noise.py` for an example.
