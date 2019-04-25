@@ -8,7 +8,7 @@ A Generic Framework for Likelihood-Free Inference
 
 It is recommended to work in an environment when running these experiments. If you are using Anaconda, e.g.:
 ```bash
-conda create -n engine python=3.6
+conda create -n engine
 conda activate engine
 ```
 
