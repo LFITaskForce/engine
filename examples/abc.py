@@ -11,6 +11,32 @@ from engine.algorithms.abc import rejection_abc
 pyro.set_rng_seed(101)
 
 
+def main(args):
+    sim = GaussianNoise()
+
+    def prior(num_samples=1):
+        dist_prior = dist.Normal(loc=torch.tensor([0.]), scale=torch.tensor([1.]))
+        inputs = pyro.sample('input', dist_prior.expand_by([num_samples]))
+        return inputs
+
+    def model(num_samples=1):
+        inputs = prior(num_samples)
+        outputs = sim(inputs)
+        return inputs, outputs
+
+    obs = sim(torch.tensor([[1.]]))
+
+    posterior = rejection_abc(
+        model=model,
+        obs=obs,
+        num_simulations=args.num_simulations,
+        threshold=args.threshold)
+
+    plt.figure()
+    plt.hist([posterior.sample() for _ in range(100)])
+    plt.show()
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_simulations', type=int, default=10000,
@@ -19,25 +45,4 @@ if __name__ == "__main__":
         help='Rejection threshold')
     args = parser.parse_args()
 
-
-    simulator_instance = GaussianNoise()
-
-    def model(num_samples=10):
-        dist_prior = dist.Normal(loc=torch.tensor([0.]), scale=torch.tensor([1.]))
-        inputs = pyro.sample('input', dist_prior.expand_by([num_samples]))
-
-        outputs = simulator_instance(inputs)
-
-        return inputs, outputs
-
-    obs = simulator_instance(torch.tensor([[1.]]))
-
-
-    posterior = rejection_abc(model, obs,
-        num_simulations=args.num_simulations, threshold=args.threshold)
-
-
-    plt.figure()
-    plt.title('posterior samples')
-    plt.hist([posterior.sample().item() for _ in range(100)])
-    plt.show()
+    main(args)

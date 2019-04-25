@@ -6,7 +6,7 @@ from functools import partial
 from pyro.infer.mcmc import MCMC, HMC, NUTS
 
 
-def AlgoMCMC(model, obs, num_samples, kernel='HMC', kernel_params={},
+def mcmc(model, obs, num_samples, kernel='HMC', kernel_params={},
              mcmc_params={}, sites=['theta']):
     # NOTE: requires differentiable model
 
