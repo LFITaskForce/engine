@@ -10,11 +10,13 @@ It is recommended to work in an environment when running these experiments. If y
 ```bash
 conda create -n engine python=3.6
 conda activate engine
-
-pip install pyro-ppl
-pip install matplotlib
 ```
 
-## Example
+To install, run:
+```bash
+pip install -e .
+```
 
-See `run_gaussian_noise.py` for an example.
+## Examples
+
+See `examples/`.

@@ -5,7 +5,7 @@ import pyro
 import pyro.distributions as dist
 import torch
 
-from simulators.gaussian_noise import GaussianNoise
+from sims.gaussian_noise import GaussianNoise
 from engine.algorithms.abc import rejection_abc
 
 pyro.set_rng_seed(101)
