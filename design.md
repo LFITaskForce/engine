@@ -108,7 +108,7 @@ We could consider introducing `engine.sample` instead of `engine.sample_simulato
 @engine.simulator({'sim': MyExternalSimulator(...)})
 def model():
     inputs = engine.sample('inputs', dist.Distribution(...))
-    outputs = engine.sample('outputs', 'sim', inputs)  # or: (inputs, 'sim')
+    outputs = engine.sample('outputs', 'sim', inputs)
 ```
 
 Undecided whether this overloading is good or bad, but will stick with it for the next examples.
@@ -116,7 +116,7 @@ Undecided whether this overloading is good or bad, but will stick with it for th
 
 #### Offline simulators
 
-The pattern from above can also be applied to cases where data has been collected offline: With an offline dataset we want to ensure that rows of dataset are always sampled together. We register the dataset and to our model, and `engine.sample` will internally take care to draw the output corresponding to the input:
+The pattern from above can also be applied to cases where data has been collected offline: With an offline dataset we want to ensure that rows of dataset are always sampled together. We register the dataset with our model. `engine.sample` will internally take care to draw the output corresponding to the input by using a pointer to the row that was sampled previously:
 
 ```python
 @engine.dataset({'inputs': torch.tensor([[...], [...]]), 'outputs': ...})
@@ -125,12 +125,12 @@ def model():
     outputs = engine.sample('outputs')
 ```
 
-Potentially, I'm overloading `engine.sample` too heavily at this point. Can always use more primitives/arguments.
+Potentially, I'm overloading `engine.sample` too heavily at this point. Can always use more primitives (e.g., `engine.sample_dataset`) or additional arguments.
 
 
 #### Hybrid cases
 
-Hybrid cases are possible by adding multiple decorators:
+Hybrid cases are possible by adding multiple decorators to a model:
 
 ```python
 @engine.dataset({'inputs': ..., 'outputs': ...})
@@ -157,13 +157,16 @@ def model():
 #### Observations
 
 Models are conditioned on particular observed data for which we want
-to do inference. For this we rely on the effect handler that is part of Pyro, e.g.,
+to do inference. For this we rely on the `pyro.condition` effect handler that is part of Pyro, e.g.,
 using it as a decorator:
 
 ```python
 @pyro.condition({'output': torch.tensor([[...]])})
 def model():
     # ...
+
+# Note that there are different ways of invoking conditioning, for instance, by
+# supplying obs to pyro.sample. We'd make sure to support these ways as well.
 ```
 
 ### Inference
@@ -172,16 +175,16 @@ def model():
 
 The conditioned model is passed to the inference algorithm. We can undo the
 conditioning inside the algorithm to create an unconditioned model to generate
-samples from. (Alternatively, we pass an unconditioned model and the observations to an inference algorithm. It's also possible to write an interface allowing both.)
+samples from. (Alternatively, we pass an unconditioned model and the observations to an inference algorithm. It's possible to write an interface allowing both of these ways.)
 
 In the simplest case, an inference algorithm is a function that takes in
-a model and returns a distribution (for instance a `dist.Empirical`):
+a model and returns a distribution. For classical rejection ABC this would be an instance of `dist.Empirical`:
 
 ```python
 posterior = engine.RejectionABC(conditioned_model, ...)
 ```
 
-For more complex cases we might have inference algorithms that are classes and have additional returns. E.g., we might want to be able to resume inference for additional steps and return diagnostics.
+For more complex cases inference algorithms are classes and have additional returns. For example, resume inference for additional steps (keeping state inside the class) and return diagnostics.
 
 
 #### Density estimation based inference
