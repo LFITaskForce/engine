@@ -17,5 +17,6 @@ _allowed_symbols = list(rv_dict.keys())
 remove_undocumented(__name__, _allowed_symbols)
 
 from ._model import *
+from .simulator import *
 
 __version__ = "0.0.1"

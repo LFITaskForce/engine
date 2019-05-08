@@ -32,3 +32,13 @@ class Model:
 
     def __call__(self, *args, **kwargs):
         return self.model_fn(*args, **kwargs)
+
+    def offline_samples(self, dataset):
+        """
+        Samples the model according to an external proposal distribution
+        """
+        iterator = iter(dataset)
+        def simulated_model():
+            with ed.interception(ed.make_value_setter(**next(iterator))):
+                return self.model_fn()
+        return simulated_model

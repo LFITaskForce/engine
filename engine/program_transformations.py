@@ -29,8 +29,8 @@ def make_joint_smpl_fn(model, targets):
         with ed.tape() as model_tape:
             obs = model(*args)
         # Clean up and remove unwanted variables from tape
-        for i in model_tape:
-            if i not in targets:
-                model_tape.pop(i)
+        # for i in model_tape:
+        #     if i not in targets:
+        #         model_tape.pop(i)
         return model_tape, obs
     return sampling_fn
