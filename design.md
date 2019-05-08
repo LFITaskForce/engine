@@ -48,25 +48,25 @@ For starters, say, we got code for an external simulator: an arbitrary  external
 
 ```python
 def model():
-	inputs = torch.tensor([[...], [...]])  # (batch, dim_inputs)
-	outputs = torch.tensor([my_simulator(inputs.numpy())])  # (batch, ...)
+    inputs = torch.tensor([[...], [...]])  # (batch, dim_inputs)
+    outputs = torch.tensor([my_simulator(inputs.numpy())])  # (batch, ...)
 ```
 
 This can be made look nicer through a decorator handling type conversion:
 
 ```python
 def model():
-	inputs = torch.tensor([[...], [...]])
-	outputs = numpy_simulator(my_simulator)(inputs)
+    inputs = torch.tensor([[...], [...]])
+    outputs = numpy_simulator(my_simulator)(inputs)
 ```
 
 Inside `model`, we invoke `pyro.sample`:
 
 ```python
 def model():
-	inputs = pyro.sample('inputs', dist.Distribution(...))
-	outputs = pyro.sample('outputs', dist.Empirical(
-		numpy_simulator(my_simulator)(inputs)))
+    inputs = pyro.sample('inputs', dist.Distribution(...))
+    outputs = pyro.sample('outputs', dist.Empirical(
+        numpy_simulator(my_simulator)(inputs)))
 ```
 
 External simulators are often implemented as classes. Note that the class instance should be created outside of `model`: We will call `model` repeatedly inside the inference algorithm and do not want to create a new instance every time.
@@ -75,9 +75,9 @@ External simulators are often implemented as classes. Note that the class instan
 my_simulator_instance = MyExternalSimulator(...)
 
 def model():
-	inputs = pyro.sample('inputs', dist.Distribution(...))
-	outputs = pyro.sample('outputs', dist.Empirical(
-		numpy_simulator(my_simulator_instance.forward)(inputs)))
+    inputs = pyro.sample('inputs', dist.Distribution(...))
+    outputs = pyro.sample('outputs', dist.Empirical(
+        numpy_simulator(my_simulator_instance.forward)(inputs)))
 ```
 
  Note that our user carries the burden to:
@@ -94,8 +94,8 @@ This would allow the following equivalent way of specifying a model:
 ```python
 @engine.simulator({'sim': MyExternalSimulator(...)})
 def model():
-	inputs = pyro.sample('inputs', dist.Distribution(...))
-	outputs = engine.sample_simulator('outputs', 'sim', inputs)  # or: (inputs, 'sim')
+    inputs = pyro.sample('inputs', dist.Distribution(...))
+    outputs = engine.sample_simulator('outputs', 'sim', inputs)  # or: (inputs, 'sim')
 
 # Note: The simulator is named in case we want to involve multiple simulators.
 ```
@@ -107,8 +107,8 @@ We could consider introducing `engine.sample` instead of `engine.sample_simulato
 ```python
 @engine.simulator({'sim': MyExternalSimulator(...)})
 def model():
-	inputs = engine.sample('inputs', dist.Distribution(...))
-	outputs = engine.sample('outputs', 'sim', inputs)  # or: (inputs, 'sim')
+    inputs = engine.sample('inputs', dist.Distribution(...))
+    outputs = engine.sample('outputs', 'sim', inputs)  # or: (inputs, 'sim')
 ```
 
 Undecided whether this overloading is good or bad, but will stick with it for the next examples.
@@ -121,7 +121,7 @@ The pattern from above can also be applied to cases where data has been collecte
 ```python
 @engine.dataset({'inputs': torch.tensor([[...], [...]]), 'outputs': ...})
 def model():
-	inputs = engine.sample('inputs')
+    inputs = engine.sample('inputs')
     outputs = engine.sample('outputs')
 ```
 
@@ -136,7 +136,7 @@ Hybrid cases are possible by adding multiple decorators:
 @engine.dataset({'inputs': ..., 'outputs': ...})
 @engine.simulator({'sim': MyExternalSimulator(...)})
 def model():
-	# ...
+    # ...
 ```
 
 #### Score compression
@@ -148,9 +148,9 @@ Score compression might make use of the same pattern, for instance by introducin
 @engine.compressor({'comp': IMNN(...)})
 @engine.simulator({'sim': MyExternalSimulator(...)})
 def model():
-	# ...
-	outputs = engine.sample('outputs', 'sim', inputs)
-	output_compressed = engine.compress('output_compressed', 'comp', output)
+    # ...
+    outputs = engine.sample('outputs', 'sim', inputs)
+    output_compressed = engine.compress('output_compressed', 'comp', output)
 ```
 
 
@@ -163,7 +163,7 @@ using it as a decorator:
 ```python
 @pyro.condition({'output': torch.tensor([[...]])})
 def model():
-	# ...
+    # ...
 ```
 
 ### Inference
@@ -193,4 +193,3 @@ density_estimator = ...  # nn.Module
 posterior = engine.NeuralLikelihood(model, density_estimator, optims, ...)
 posterior = engine.NeuralPosterior(model, density_estimator, optims, ...)
 ```
-
