@@ -1,4 +1,5 @@
 import argparse
+import engine
 import matplotlib.pyplot as plt
 import numpy as np
 import pyro
@@ -12,19 +13,15 @@ pyro.set_rng_seed(101)
 
 
 def main(args):
-    sim = GaussianNoise()
-
-    def prior(num_samples=1):
-        dist_prior = dist.Normal(loc=torch.tensor([0.]), scale=torch.tensor([1.]))
-        inputs = pyro.sample('input', dist_prior.expand_by([num_samples]))
-        return inputs
-
+    @engine.register_simulator(name='gn', simulator=GaussianNoise())
     def model(num_samples=1):
-        inputs = prior(num_samples)
-        outputs = sim(inputs)
+        inputs = pyro.sample('input',
+            dist.Normal(loc=torch.tensor([0.]),
+                        scale=torch.tensor([1.])).expand_by([num_samples]))
+        outputs = engine.simulate('gn', inputs)
         return inputs, outputs
 
-    obs = sim(torch.tensor([[1.]]))
+    obs = torch.tensor([[1.]])
 
     posterior = rejection_abc(
         model=model,
