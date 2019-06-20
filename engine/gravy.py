@@ -54,11 +54,14 @@ class simulator(Messenger):
         else:
             # If the current site name exists in the dataset override the value
             if name in self.sample:
-                msg['value'] = self.sample[name]
+                if msg['value'] is None:
+                    msg['value'] = self.sample[name]
 
             # If we have reached the site of the simulator, also draw the next
             # sample
             if name == self.name:
+                msg['fn'] = lambda *args, **kwargs: self.sample[name]
+
                 self._draw_offline_sample()
 
 
