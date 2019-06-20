@@ -25,20 +25,19 @@ class simulator(Messenger):
         self.name = name
         self.simulator_fn = simulator_fn
         self.dataset = dataset
-        if dataset is not None:
-            self.dataset = enumerate(self.dataset)
         self.sample = None
 
         # Load the data buffer for the offline simulator
         if dataset is not None:
+            self.dataset = enumerate(self.dataset)
             self._draw_offline_sample()
 
     def _draw_offline_sample(self):
         """
         Loads the next sample from the offline dataset
         """
-        if self.dataset is not None:
-            _, self.data = next(self.dataset)
+        _, data = next(self.dataset)
+        self.sample = data
 
     def _pyro_sample(self, msg):
         """
@@ -54,10 +53,10 @@ class simulator(Messenger):
         # Otherwise, we use the offline dataset
         else:
             # If the current site name exists in the dataset override the value
-            if name in self.data:
-                msg['value'] = self.data[name]
+            if name in self.sample:
+                msg['value'] = self.sample[name]
 
-            # If we have reached the site of the simulator. also draw the next
+            # If we have reached the site of the simulator, also draw the next
             # sample
             if name == self.name:
                 self._draw_offline_sample()
