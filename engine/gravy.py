@@ -1,12 +1,11 @@
 # Modules on top of Pyro's poutine
 from __future__ import absolute_import, division, print_function
 
-import pyro
-from pyro.poutine.messenger import Messenger
+import numpyro
+from numpyro.primitives import Messenger
 
 __all__ = ['simulator',
            'simulate']
-
 
 class simulator(Messenger):
     """
@@ -39,7 +38,7 @@ class simulator(Messenger):
         _, data = next(self.dataset)
         self.sample = data
 
-    def _pyro_sample(self, msg):
+    def process_message(self, msg):
         """
         :param msg: current message at a trace site
         """
@@ -61,9 +60,8 @@ class simulator(Messenger):
             # sample
             if name == self.name:
                 msg['fn'] = lambda *args, **kwargs: self.sample[name]
-
                 self._draw_offline_sample()
 
 
 def simulate(name,  *args, **kwargs):
-    return pyro.sample(name, None, *args, **kwargs)
+    return numpyro.sample(name, None, *args, **kwargs)

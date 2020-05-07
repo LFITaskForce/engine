@@ -1,5 +1,5 @@
 __version__ = "0.0.1"
 
-import pyro.distributions as distributions
-from pyro import *
+import numpyro.distributions as distributions
+from numpyro import *
 from .gravy import *
