@@ -1,27 +1,28 @@
 # Modules on top of Pyro's poutine
 from __future__ import absolute_import, division, print_function
 
-import pyro
-from pyro.poutine.messenger import Messenger
+import numpyro as pyro
+# import pyro
+from numpyro.handlers import Messenger
+# from pyro.poutine.messenger import Messenger
 
-__all__ = ['simulator',
-           'simulate']
+__all__ = ['simulator', 'simulate', 'uncondition']
 
 
-class simulator(Messenger):
+class SimulatorMessenger(Messenger):
     """
     Inserts the effects of an online or offline simulator inside the execution
     of the model.
     """
 
-    def __init__(self, name, simulator_fn=None, dataset=None):
+    def __init__(self, name, model_fn, simulator_fn=None, dataset=None):
         """
         :param name: Name of the simulator
         :param simulator_fn: Stochastic function defining the simulator
         :param dataset: Pyro dataloader instance yielding a dictionary of
                         simulated inputs and ouputs
         """
-        super(simulator, self).__init__()
+        super().__init__(model_fn)
         self.name = name
         self.simulator_fn = simulator_fn
         self.dataset = dataset
@@ -65,5 +66,33 @@ class simulator(Messenger):
                 self._draw_offline_sample()
 
 
-def simulate(name,  *args, **kwargs):
-    return pyro.sample(name, None, *args, **kwargs)
+class uncondition(Messenger):
+    """
+    Messenger to force the value of observed nodes to be sampled from their
+    distribution, ignoring observations.
+    """
+    def __init__(self, fn=None):
+        super().__init__(fn)
+
+    def process_message(self, msg):
+        """
+        :param msg: current message at a trace site.
+
+        Samples value from distribution, irrespective of whether or not the
+        node has an observed value.
+        """
+        if msg["is_observed"]:
+            msg["is_observed"] = False
+            # msg["infer"]["was_observed"] = True
+            msg["obs"] = msg["value"]
+            msg["value"] = None
+            msg["done"] = False
+        return None
+
+
+def simulator(name, simulator_fn=None, dataset=None):
+    return lambda fn: SimulatorMessenger(name, fn, simulator_fn, dataset)
+
+
+def simulate(name, *args, **kwargs):
+    return pyro.sample(name, *args, **kwargs)
