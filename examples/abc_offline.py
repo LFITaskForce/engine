@@ -3,7 +3,8 @@ import engine
 dist = engine.distributions
 import matplotlib.pyplot as plt
 
-import torch
+import numpy as np
+# import torch
 from torch.utils.data import DataLoader, Dataset
 
 from sims.gaussian_noise import GaussianNoise
@@ -33,19 +34,19 @@ def main(args):
     # First use the simulator to draw an offline dataset set
     @engine.simulator(name='gn', simulator_fn=GaussianNoise())
     def online_model():
-        inputs = engine.sample('input', dist.Normal(loc=torch.tensor([0.]),
-                                                    scale=torch.tensor([1.])))
+        inputs = engine.sample('input', dist.Normal(loc=np.array([0.]),
+                                                    scale=np.array([1.])))
         outputs = engine.simulate('gn', inputs)
         return inputs, outputs
     proposal, sims = vectorize(online_model, 10000)()
     offline_dset = DataLoader(SimsDataset(proposal, sims))
 
 
-    obs = torch.tensor([[1.]])
+    obs = np.array([[1.]])
     @engine.simulator(name='gn', dataset=offline_dset)
     def model():
-        inputs = engine.sample('input', dist.Normal(loc=torch.tensor([0.]),
-                                                    scale=torch.tensor([1.])))
+        inputs = engine.sample('input', dist.Normal(loc=np.array([0.]),
+                                                    scale=np.array([1.])))
         outputs = engine.simulate('gn', inputs, obs=obs)
         return inputs, outputs
 

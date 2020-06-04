@@ -1,9 +1,7 @@
-import pyro
-import pyro.distributions as pyd
-import torch
+import numpyro
 
 from functools import partial
-from pyro.infer.mcmc import MCMC, HMC, NUTS
+from numpyro.infer.mcmc import MCMC, HMC, NUTS
 
 
 def mcmc(model, obs, num_samples, kernel='HMC', kernel_params={},
@@ -22,6 +20,6 @@ def mcmc(model, obs, num_samples, kernel='HMC', kernel_params={},
     mcmc = MCMC(mcmc_kernel, num_samples, **mcmc_params)
     mcmc_run = mcmc.run()
 
-    posterior = pyro.infer.EmpiricalMarginal(mcmc_run, sites=sites)
+    posterior = numpyro.infer.EmpiricalMarginal(mcmc_run, sites=sites)
 
     return posterior
