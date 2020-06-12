@@ -1,12 +1,12 @@
 import numpy as np
 import numpyro
 from numpyro import handlers as poutine
-# import pyro.poutine as poutine
-# import torch
 
 from engine.gravy import uncondition
 
-from pyro.infer.abstract_infer import TracePosterior
+# Pending upstream into numpyro
+# from numpyro.infer.abstract_infer import TracePosterior
+from engine.abstract_infer import TracePosterior
 from tqdm.auto import tqdm
 
 
@@ -24,7 +24,6 @@ class RejectionABC(TracePosterior):
 
     def __init__(self, model, threshold, num_samples, disable_progbar=False):
         super().__init__()
-        # super(RejectionABC, self).__init__()
 
         trace = poutine.trace(model).get_trace()
         assert len(trace) == 1, 'model should have a single observed site, but got: {}'.format(trace.keys())

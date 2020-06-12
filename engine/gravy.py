@@ -1,10 +1,8 @@
 # Modules on top of Pyro's poutine
 from __future__ import absolute_import, division, print_function
 
-import numpyro as pyro
-# import pyro
-from numpyro.handlers import Messenger
-# from pyro.poutine.messenger import Messenger
+import numpyro
+from numpyro.handlers import Messenger, seed
 
 __all__ = ['simulator', 'simulate', 'uncondition']
 
@@ -95,4 +93,4 @@ def simulator(name, simulator_fn=None, dataset=None):
 
 
 def simulate(name, *args, **kwargs):
-    return pyro.sample(name, *args, **kwargs)
+    return numpyro.sample(name, *args, **kwargs)

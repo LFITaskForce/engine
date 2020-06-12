@@ -1,7 +1,5 @@
-# import torch
 import numpy as np
 
-# from torch.distributions import MultivariateNormal
 from numpyro.distributions import MultivariateNormal
 
 class GaussianNoise:
