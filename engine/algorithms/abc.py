@@ -26,7 +26,7 @@ class RejectionABC(TracePosterior):
         super().__init__()
 
         trace = poutine.trace(model).get_trace()
-        assert len(trace) == 1, 'model should have a single observed site, but got: {}'.format(trace.keys())
+        # assert len(trace) == 1, 'model should have a single observed site, but got: {}'.format(trace.keys())
 
         self.model = model
         self.threshold = threshold

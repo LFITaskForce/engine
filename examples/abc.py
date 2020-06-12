@@ -13,12 +13,13 @@ from engine.algorithms.abc import RejectionABC
 def main(args):
     obs = np.array([[1.]])
 
-    @engine.simulator(name='gn', simulator_fn=GaussianNoise())
+    # @engine.simulator(name='gn', simulator_fn=GaussianNoise())
     def model():
         inputs = numpyro.sample('input', dist.Normal(loc=np.array([0.]), scale=np.array([1.])))
-        outputs = numpyro.sample('gn', fn=None, obs=obs, inputs=inputs)
-        return inputs, outputs
+        # outputs = numpyro.sample('gn', fn=None, obs=obs)
+        return inputs
 
+    model = engine.simulator('gn', simulator_fn=GaussianNoise)(model)
     model = seed(model, rng_seed=101)
 
     # import pdb; pdb.set_trace()
@@ -31,7 +32,7 @@ def main(args):
     posterior = abc.run(rng_seed=1)
 
     plt.figure()
-    plt.hist( posterior.marginal('input').empirical['input']._get_samples_and_weights()[0].numpy().flatten())
+    plt.hist( posterior.marginal('input').empirical['input']._get_samples_and_weights()[0].flatten())
     plt.show()
 
 

@@ -4,7 +4,7 @@ from collections import defaultdict, OrderedDict
 
 import numpy as np
 
-from pyro.distributions import Empirical
+from engine.empirical import Empirical
 from numpyro.distributions import Categorical
 from numpyro import handlers
 
