@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 import numpyro
-from numpyro.handlers import seed
+from numpyro.handlers import seed, condition
 
 from sims.gaussian_noise import GaussianNoise
 from engine.algorithms.abc import RejectionABC
@@ -13,13 +13,12 @@ from engine.algorithms.abc import RejectionABC
 def main(args):
     obs = np.array([[1.]])
 
-    # @engine.simulator(name='gn', simulator_fn=GaussianNoise())
+    @engine.simulator(name='gn', simulator_fn=GaussianNoise())
     def model():
         inputs = numpyro.sample('input', dist.Normal(loc=np.array([0.]), scale=np.array([1.])))
-        # outputs = numpyro.sample('gn', fn=None, obs=obs)
-        return inputs
+        outputs = numpyro.sample('gn', fn=None, obs=obs)
+        return inputs, outputs
 
-    model = engine.simulator('gn', simulator_fn=GaussianNoise)(model)
     model = seed(model, rng_seed=101)
 
     # import pdb; pdb.set_trace()
