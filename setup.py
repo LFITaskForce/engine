@@ -17,8 +17,12 @@ with open(os.path.join(package_name, "__init__.py"), "rt") as fh:
 
 _install_requires = [
     "numpy",
+    "numpyro",
+    "jax",
+    "jaxlib",
     "pyro-ppl",
-    "torch"]
+    "torch"
+]
 
 _parameters = {
     "install_requires": _install_requires,
